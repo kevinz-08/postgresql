@@ -1,9 +1,8 @@
 -- Active: 1755090651571@@127.0.0.1@5433@miscompras@public
--- Crear la base de datos
+-- se crea la base de datos                                 -- recordar conectarse a la base de datos creada, ya que por defecto se conecta a la de campus
 CREATE DATABASE miscompras;
-\c miscompras;
 
--- Tabla clientes
+-- clientes
 CREATE TABLE clientes (
     id VARCHAR(20) PRIMARY KEY,
     nombre VARCHAR(40) NOT NULL,
@@ -13,14 +12,14 @@ CREATE TABLE clientes (
     correo_electronico VARCHAR(70)
 );
 
--- Tabla categorias
+-- categorias
 CREATE TABLE categorias (
     id_categoria SERIAL PRIMARY KEY,
     descripcion VARCHAR(45) NOT NULL,
     estado SMALLINT NOT NULL
 );
 
--- Tabla productos
+-- productos
 CREATE TABLE productos (
     id_producto SERIAL PRIMARY KEY,
     nombre VARCHAR(45) NOT NULL,
@@ -32,7 +31,7 @@ CREATE TABLE productos (
     FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
 );
 
--- Tabla compras
+-- compras
 CREATE TABLE compras (
     id_compra SERIAL PRIMARY KEY,
     id_cliente VARCHAR(20) NOT NULL,
@@ -43,7 +42,7 @@ CREATE TABLE compras (
     FOREIGN KEY (id_cliente) REFERENCES clientes(id)
 );
 
--- Tabla compras_productos (relación N:N)
+-- compras_productos
 CREATE TABLE compras_productos (
     id_compra INT NOT NULL,
     id_producto INT NOT NULL,
