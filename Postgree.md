@@ -42,130 +42,109 @@ psql ... --username=postgres ...
 - `\di`: Listar los indices
 - `\dp \z`: listado de privilegios de las tablas
 
-```sql
-CREATE TYPE sexo AS ENUM('masculino','femenino', 'otro');
+## Tipos de Datos
+
+### Tipos de Datos Numéricos
+
+| Name               | Storage Size | Description                     | Range                                                        |
+| ------------------ | ------------ | ------------------------------- | ------------------------------------------------------------ |
+| `smallint`         | 2 bytes      | small-range integer             | -32768 to +32767                                             |
+| `integer`          | 4 bytes      | typical choice for integer      | -2147483648 to +2147483647                                   |
+| `bigint`           | 8 bytes      | large-range integer             | -9223372036854775808 to +9223372036854775807                 |
+| `decimal`          | variable     | user-specified precision, exact | up to 131072 digits before the decimal point; up to 16383 digits after the decimal point |
+| `numeric`          | variable     | user-specified precision, exact | up to 131072 digits before the decimal point; up to 16383 digits after the decimal point |
+| `real`             | 4 bytes      | variable-precision, inexact     | 6 decimal digits precision                                   |
+| `double precision` | 8 bytes      | variable-precision, inexact     | 15 decimal digits precision                                  |
+| `smallserial`      | 2 bytes      | small autoincrementing integer  | 1 to 32767                                                   |
+| `serial`           | 4 bytes      | autoincrementing integer        | 1 to 2147483647                                              |
+| `bigserial`        | 8 bytes      | large autoincrementing integer  | 1 to 9223372036854775807                                     |
+
+### Tipos de Datos de Caracteres
+
+| Name                                               | Description                              |
+| -------------------------------------------------- | ---------------------------------------- |
+| `character varying(*`n`*)`, `varchar(*`n`*)`       | variable-length with limit               |
+| `character(*`n`*)`, `char(*`n`*)`, `bpchar(*`n`*)` | fixed-length, blank-padded               |
+| `bpchar`                                           | variable unlimited length, blank-trimmed |
+| `text`                                             | variable unlimited length                |
+
+### Tipos de Datos Booleanos
+
+| Name      | Storage Size | Description            |
+| --------- | ------------ | ---------------------- |
+| `boolean` | 1 byte       | state of true or false |
+
+### [Tipos de Datos de Fecha y Hora](https://www.postgresql.org/docs/current/datatype-datetime.html)
+
+| Name                                          | Storage Size | Description                           | Low Value        | High Value      | Resolution    |
+| --------------------------------------------- | ------------ | ------------------------------------- | ---------------- | --------------- | ------------- |
+| `timestamp [ (*`p`*) ] [ without time zone ]` | 8 bytes      | both date and time (no time zone)     | 4713 BC          | 294276 AD       | 1 microsecond |
+| `timestamp [ (*`p`*) ] with time zone`        | 8 bytes      | both date and time, with time zone    | 4713 BC          | 294276 AD       | 1 microsecond |
+| `date`                                        | 4 bytes      | date (no time of day)                 | 4713 BC          | 5874897 AD      | 1 day         |
+| `time [ (*`p`*) ] [ without time zone ]`      | 8 bytes      | time of day (no date)                 | 00:00:00         | 24:00:00        | 1 microsecond |
+| `time [ (*`p`*) ] with time zone`             | 12 bytes     | time of day (no date), with time zone | 00:00:00+1559    | 24:00:00-1559   | 1 microsecond |
+| `interval [ *`fields`* ] [ (*`p`*) ]`         | 16 bytes     | time interval                         | -178000000 years | 178000000 years | 1 microsecond |
+
+### Tipos de Datos Monetarios
+
+| Name    | Storage Size | Description     | Range                                          |
+| ------- | ------------ | --------------- | ---------------------------------------------- |
+| `money` | 8 bytes      | currency amount | -92233720368547758.08 to +92233720368547758.07 |
+
+### [Tipos de Datos Binarios](https://www.postgresql.org/docs/current/datatype-binary.html)
+
+Una cadena binaria es una secuencia de octetos (o bytes). Las cadenas binarias se distinguen de las cadenas de caracteres de dos maneras. Primero, las cadenas binarias permiten específicamente almacenar octetos con valor cero y otros octetos "no imprimibles" (generalmente, octetos fuera del rango decimal de 32 a 126). Las cadenas de caracteres no permiten octetos con valor cero, ni tampoco permiten cualquier otro valor de octeto y secuencias de valores de octetos que sean inválidos según la codificación del conjunto de caracteres seleccionados en la base de datos. En segundo lugar, las operaciones en cadenas binarias procesan los bytes reales, mientras que el procesamiento de cadenas de caracteres depende de la configuración regional. En resumen, las cadenas binarias son apropiadas para almacenar datos que el programador considera como "bytes en bruto", mientras que las cadenas de caracteres son apropiadas para almacenar texto.
+
+El tipo `bytea` soporta dos formatos para entrada y salida: el formato "hex" y el formato "escape" histórico de PostgreSQL. Ambos formatos son siempre aceptados en la entrada. El formato de salida depende del parámetro de configuración `bytea_output`; el valor predeterminado es hex. (Tenga en cuenta que el formato hex se introdujo en PostgreSQL 9.0; las versiones anteriores y algunas herramientas no lo entienden).
+
+| Name    | Storage Size                               | Description                   |
+| ------- | ------------------------------------------ | ----------------------------- |
+| `bytea` | 1 or 4 bytes plus the actual binary string | variable-length binary string |
+
+### [Tipos de Datos de Redes](https://www.postgresql.org/docs/current/datatype-net-types.html)
+
+| Name       | Storage Size  | Description                      |
+| ---------- | ------------- | -------------------------------- |
+| `cidr`     | 7 or 19 bytes | IPv4 and IPv6 networks           |
+| `inet`     | 7 or 19 bytes | IPv4 and IPv6 hosts and networks |
+| `macaddr`  | 6 bytes       | MAC addresses                    |
+| `macaddr8` | 8 bytes       | MAC addresses (EUI-64 format)    |
+
+## [Tipos de Datos Geométricos](https://www.postgresql.org/docs/current/datatype-geometric.html)
+
+| Name      | Storage Size | Description                      | Representation                      |
+| --------- | ------------ | -------------------------------- | ----------------------------------- |
+| `point`   | 16 bytes     | Point on a plane                 | (x,y)                               |
+| `line`    | 32 bytes     | Infinite line                    | {A,B,C}                             |
+| `lseg`    | 32 bytes     | Finite line segment              | ((x1,y1),(x2,y2))                   |
+| `box`     | 32 bytes     | Rectangular box                  | ((x1,y1),(x2,y2))                   |
+| `path`    | 16+16n bytes | Closed path (similar to polygon) | ((x1,y1),...)                       |
+| `path`    | 16+16n bytes | Open path                        | [(x1,y1),...]                       |
+| `polygon` | 40+16n bytes | Polygon (similar to closed path) | ((x1,y1),...)                       |
+| `circle`  | 24 bytes     | Circle                           | <(x,y),r> (center point and radius) |
+
+
+
+### Tipos de Datos JSON y XML
+
+- `json`: Datos en formato JSON
+- `jsonb`: Datos JSON en un formato binario más eficiente
+- `xml`: Datos en formato XML
+
+### Tipos de Datos Especiales
+
+- `uuid`: Identificador único universal
+- `array`: Arreglos de cualquier tipo de datos
+- `composite`: Tipo compuesto de varios tipos de datos
+- `range`: Rango de valores
+
+### Enumeradores
+```pgsql
+CREATE TYPE sexo AS ENUM('Masculino', 'Femenino', 'Otro');
 
 CREATE TABLE camper(
-    name VARCHAR(100) NOT NULL,
+    name varchar(100) NOT NULL,
     sexo_camper sexo NOT NULL
 );
 ```
 
-```sql
-CREATE TABLE ejemplo (
-    id serial PRIMARY KEY,
-    nombre varchar(100) NOT NULL,
-    descripcion text NULL,
-    precio numeric(10,2) NOT NULL,
-    en_stock boolean NOT NULL,
-    fecha_creacion date NOT NULL,
-    hora_creacion time NOT NULL,
-    fecha_hora timestamp NOT NULL,
-    fecha_hora_zona timestamp with time zone,
-    duracion interval,
-    direccion_ip inet,
-    direccion_mac macaddr,
-    punto_geometrico point,
-    datos_json json,
-    datos_jsonb jsonb,
-    identificador_unico uuid,
-    cantidad_monetario money,
-    rangos int4range,
-    colores_preferidos varchar(20)[]
-);
-```
-
-### Insert para `Ejemplo`
-```sql
-INSERT INTO ejemplo (
-nombre, descripcion, precio, en_stock, fecha_creacion, hora_creacion, fecha_hora, fecha_hora_zona, duracion, direccion_ip , direccion_mac , punto_geometrico , datos_json , datos_jsonb , identificador_unico , cantidad_monetario , rangos, colores_preferidos)
-VALUES(
-    'Ejemplo A', 'Lorem ipsum......', 9990.99, true, '2025-07-10', '20:30:10', '2025-07-10 20:30:10', '2025-07-10 20:30:10-05', '1 day', '192.168.0.1', '08:00:27:00:00:00', '(10, 20)', '{"key":"value"} ', '{"key":"value"}', 'b8ac502c-7049-4ae5-aa7e-642ad77ca4f1', '100.00', '[10, 20)', ARRAY['rojo','verde','azul', 'otro']
-);
-```
-## Definicion de Contraints (Restricciones)
-
-### Tabla de Ejemplo
-``` SQL
-CREATE TABLE empleados(
-    id serial,
-    nombre varchar(100) NOT NULL,
-    edad integer NOT NULL,
-    salario numeric(10,2) NOT NULL,
-    fecha_contrato date,
-    vigente boolean DEFAULT true
-);
-```
-```sql
-CREATE TABLE departamentos(
-    id serial,
-    nombre varchar(100) NOT NULL,
-    vigente boolean DEFAULT true,
-    PRIMARY KEY(id)
-);
-
-ALTER TABLE empleados ADD COLUMN departamento_id integer NOT NULL;
-```
-
-## Constraints a Tablas existentes
-
-### Primary Key
-
-``` SQL
-ALTER TABLE empleados ADD PRIMARY KEY(id);
-```
-
-### Foreign Key
-```sql
-ALTER TABLE empleados ADD CONSTRAINT fk_departamentos FOREIGN KEY (departamento_id) REFERENCES departamentos(id);
-```
-
-### Unique
-> Agregar la restriccion de UNIQUE a `nombre`
-```sql
-ALTER TABLE empleados ADD CONSTRAINT uk_nombre UNIQUE(nombre);
-```
-### Check
-> Agrega la restriccion de CHECK para validar que la `edad` del empleado sea >= 18
-```sql
-ALTER TABLE empleados ADD CONSTRAINT ck_edad CHECK (edad >= 18);
-```
-### Default
-> Agregar un DEFAULT para `salario` de 400.00
-```sql
-ALTER TABLE empleados ALTER COLUMN salario SET DEFAULT 400.00;
-```
-### Not Null
-> Agregar la restriccion de NOT NULL a `nombre`
-```sql
-ALTER TABLE empleados ALTER COLUMN nombre SET NOT NULL;
-```
-
-## Taller de Constraints
-```sql
-CREATE TABLE country (
-    id serial,
-    name varchar(50)
-);
-```
-```sql
-CREATE TABLE region (
-    id serial,
-    name varchar(50),
-    idcountry integer
-);
-```
-```sql
-CREATE TABLE city (
-    id serial,
-    name varchar(50),
-    idregion integer
-);
-```
-
-### Solucion
-```sql
-ALTER TABLE country ADD PRIMARY KEY (id);
-
-ALTER TABLE country 
-```

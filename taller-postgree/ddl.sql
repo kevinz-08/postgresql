@@ -1,5 +1,5 @@
 -- Active: 1755090651571@@127.0.0.1@5433@miscompras@public
--- se crea la base de datos                                 -- recordar conectarse a la base de datos creada, ya que por defecto se conecta a la de campus
+-- se crea la base de datos                          psql -h localhost -U admin -d campus -W       -- recordar conectarse a la base de datos creada, ya que por defecto se conecta a la de campus
 CREATE DATABASE miscompras;
 
 -- clientes
