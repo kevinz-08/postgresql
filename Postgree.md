@@ -418,3 +418,41 @@ CREATE TABLE city (
 
 
     ```
+
+
+## Retroalimentacion
+# Funciones y Operadores en SQL
+
+## 🔢 Funciones de agregación (trabajan sobre conjuntos de filas)
+
+- `SUM(columna)` → suma valores  
+- `AVG(columna)` → promedio  
+- `COUNT(*)` → número de filas  
+- `MAX(columna)` / `MIN(columna)` → valores extremos  
+
+## 🔤 Funciones de texto
+
+- `UPPER(nombre)` → todo en mayúsculas  
+- `LOWER(nombre)` → todo en minúsculas  
+- `INITCAP(nombre)` → primera letra mayúscula  
+- `CONCAT(nombre, apellido)` → une cadenas  
+
+## 🕒 Funciones de fecha y hora
+
+- `NOW()` → fecha y hora actual  
+- `AGE(fecha_nacimiento)` → edad (diferencia con hoy)  
+- `EXTRACT(YEAR FROM fecha)` → solo el año  
+
+## 📊 Funciones estadísticas
+
+- `PERCENTILE_CONT(0.5)` → mediana  
+- `ROUND(AVG(salario), 2)` → redondeo  
+
+## ⚙️ Operadores comunes
+
+- `=` → igualdad  
+- `<>` o `!=` → distinto  
+- `>`, `<`, `>=`, `<=` → comparaciones  
+- `ILIKE 'caf%'` → búsqueda sin importar mayúsculas/minúsculas  
+- `AND`, `OR`, `NOT` → lógicos  
+- `||` → concatenación de texto  
